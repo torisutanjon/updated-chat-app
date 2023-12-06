@@ -1,0 +1,94 @@
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+// Necessary for Next auth
+model Account {
+    id                String @id @default(auto()) @map("_id") @db.ObjectId
+    userId            String @db.ObjectId
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? // @db.Text
+    access_token      String? // @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? // @db.Text
+    session_state     String?
+    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([provider, providerAccountId])
+}
+
+model Session {
+    id           String @id @default(auto()) @map("_id") @db.ObjectId
+    sessionToken String   @unique
+    userId       String @db.ObjectId
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+    id            String @id @default(auto()) @map("_id") @db.ObjectId
+    name          String?
+    username      String?
+    email         String?   @unique
+    verificationToken String?
+    emailVerified DateTime?
+    friends       String[] @default([])
+    image         String?
+    notificationList Notification[] 
+    accounts      Account[]
+    sessions      Session[]
+
+    @@index([name, username])
+}
+
+model VerificationToken {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    identifier String
+    token      String   @unique
+    expires    DateTime
+
+    @@unique([identifier, token])
+}
+
+model Room {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    roomName String
+    alternativeRoomNames String[] @default([]) //this will be populated if the room type is  "peer" by the name of the two participants
+    roomType String
+    roomPassword String?
+    participants String[] @default([])
+    chats Chat[]
+}
+
+model Chat{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    message String
+    sender String
+    date   DateTime
+    roomID String @db.ObjectId
+    room Room @relation(fields: [roomID], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    userId       String @db.ObjectId
+    sentTo String
+    from String
+    senderName String
+    image String
+    message String
+    read Boolean @default(false)
+    responded Boolean @default(false)
+    timeSent DateTime
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
