@@ -3,7 +3,6 @@ const webSocket = async (io: Server) => {
   io.on("connection", (socket: Socket) => {
     socket.on("join-room", (room) => {
       socket.join(room);
-      console.log(`${socket.id} has join ${room}`);
     });
     socket.on("send-message", ({ room, message, senderID, senderName }) => {
       io.to(room).emit("response-message", { message, senderID, senderName });
@@ -22,7 +21,6 @@ const webSocket = async (io: Server) => {
     });
     socket.on("on-leave", (room) => {
       socket.leave(room);
-      console.log("Leaved room");
     });
   });
 };

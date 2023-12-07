@@ -33,7 +33,7 @@ const FriendList = ({ data }: IFriendListProps) => {
             {friend.name?.charAt(0)}
           </button>
         )}
-        <p className="ml-2 hidden truncate text-xs text-semiLightWhite/60 dark:text-semiBlack/75 lg:block">
+        <p className="ml-2 hidden truncate text-xs text-semiLightWhite dark:text-semiBlack/75 lg:block">
           {friend.name}
         </p>
       </button>
